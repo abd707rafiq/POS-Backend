@@ -1,9 +1,30 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect} from 'react'
 import { FaInfoCircle } from 'react-icons/fa'
+import axios from 'axios'
 
 const AddorEditCustomerGrp = (props) => {
     const [info, setInfo] = useState(false)
     const [calcType, setCalcType] = useState('Percentage')
+    const [sellingPriceGroup, setSellingPriceGroup] = useState('');
+  const [percentage, setPercentage] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/contact/customergroup', {
+          customerGroupName: props.customerGroupName,
+          calculationType: calcType,
+          sellingPriceGroup: sellingPriceGroup,
+          percentage: percentage,
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
     return (
         <div className='w-full bg-gray-50 flex flex-col'>
             <h1 className='text-xl font-bold text-start'>{props.id === 0 ? "Add Customer Group" : "Edit Customer Group"}</h1>

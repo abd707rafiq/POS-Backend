@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { AiOutlineDelete, AiOutlinePlus } from 'react-icons/ai'
 import { MdCancel } from 'react-icons/md'
 import { FaColumns, FaEdit, FaFileCsv, FaFileExcel, FaFilePdf, FaPrint, FaSearch } from 'react-icons/fa'
@@ -8,62 +8,32 @@ import * as XLSX from 'xlsx'
 import { jsPDF } from 'jspdf';
 import * as htmlToImage from 'html-to-image';
 import AddorEditCustomerGrp from '../contacts/AddorEditCustomerGrp';
+import axios from'axios';
 
 
 const CustomerGrpTbl = () => {
-    const dummyData = [
-        {
-            id: 1,
-            Username: "username",
-            Name: "User",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 2,
-            Username: "username1",
-            Name: "User1",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 3,
-            Username: "username2",
-            Name: "User2",
-            Role: "Admin",
-            Email: "username2@gmail.com"
-        },
-        {
-            id: 4,
-            Username: "username3",
-            Name: "User3",
-            Role: "Admin",
-            Email: "username3@gmail.com"
-        },
-        {
-            id: 5,
-            Username: "username4",
-            Name: "User4",
-            Role: "Admin",
-            Email: "username4@gmail.com"
-        },
-        {
-            id: 6,
-            Username: "username5",
-            Name: "User5",
-            Role: "Admin",
-            Email: "username5@gmail.com"
-        },
-        {
-            id: 7,
-            Username: "username6",
-            Name: "User6",
-            Role: "Admin",
-            Email: "username6@gmail.com"
-        }
-    ]
-    const printRef = useRef()
-    let xlDatas = []
+   const [data,setData]=useState([]);
+   const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+    const getDataFromApi = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/contact/customergroup');
+        setData(response.data);
+        console.log(response);
+        setLoading(false);
+      } catch (e) {
+        console.log('Error fetching data: ', e);
+      }
+    };
+    getDataFromApi();
+  }, []);
+   
+
+  
+  const printRef = useRef()
+  let xlDatas = []
+   
     //Export to Excel
     const handleExportExcl = (userDatas) => {
         userDatas.map(xlData => {
@@ -94,8 +64,8 @@ const CustomerGrpTbl = () => {
     const rcrdprpg = 5
     const lasIndex = crpage * rcrdprpg
     const frstIndex = lasIndex - rcrdprpg
-    const record = dummyData.slice(frstIndex, lasIndex)
-    const npage = Math.ceil(dummyData.length / rcrdprpg)
+    const record = data.slice(frstIndex, lasIndex)
+    const npage = Math.ceil(data.length / rcrdprpg)
     const numbers = [...Array(npage + 1).keys()].slice(1)
 
     const [colvis, setColvis] = useState(false)
@@ -110,7 +80,7 @@ const CustomerGrpTbl = () => {
 
     const csvData = [
         ["Username", "Name", "Role", "Email"],
-        ...dummyData.map(({ Username, Name, Role, Email }) => [
+        ...data.map(({ Username, Name, Role, Email }) => [
             Username,
             Name,
             Role,
@@ -183,7 +153,7 @@ const CustomerGrpTbl = () => {
 
                             </CSVLink>
                         </button>
-                        <button onClick={() => { handleExportExcl(dummyData) }} className='flex border-[1px] px-2 py-1 hover:bg-gray-400 border-gray-600 bg-gray-200 '>
+                        <button onClick={() => { handleExportExcl(data) }} className='flex border-[1px] px-2 py-1 hover:bg-gray-400 border-gray-600 bg-gray-200 '>
                             <FaFileExcel size={15} className=' mt-1 pr-[2px]' />
                             <h1 className='text-sm'>Export to Excle</h1>
                         </button>
@@ -235,8 +205,8 @@ const CustomerGrpTbl = () => {
                         {record.map((value, index) => {
                             return <tr key={index} className={`${(index + 1) % 2 === 0 ? "bg-gray-200" : ""}`}>
 
-                                {col1 && <td className="px-1 py-1 text-sm">{value.Username}</td>}
-                                {col2 && <td className="px-1 py-1"> {value.Name}</td>}
+                                {col1 && <td className="px-1 py-1 text-sm">{value.groupName}</td>}
+                                {col2 && <td className="px-1 py-1"> {value.priceCalculation}</td>}
                                 {col3 && <td className="px-1 py-1">{value.Role}</td>}
                                 {col4 && <td className='py-1 flex '>
                                     <div onClick={() => { setEditId(value.id); setIsedit(true); setIsClike(!isClike) }} className='flex mx-1 p-1 items-center bg-blue-600 text-white justify-center'>
