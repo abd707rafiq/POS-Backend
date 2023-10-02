@@ -32,6 +32,14 @@ const stockAdjustmentRoutes = require('./router/stockAdjustmentRoutes');
 const expenseRoutes = require('./router/expenseRoutes');
 const expenseCategoryRoutes = require('./router/expenseCategoryRoutes');
 const accountRoutes = require('./router/accountRoutes');
+// My routes
+const contact_routes= require("./routes/Contact")
+const group_routes=require("./routes/Customergroup")
+const purchase_routes=require("./routes/PurchaseOrder")
+const purchase_due=require("./routes/AddPurchases")
+const purchase_return=require("./routes/PurchaseReturn")
+const recipe_s=require("./routes/Recipe")
+const production_m=require("./routes/Production")
 
 // const financialRoutes = require('./router/financialRoutes');
 const kitchenRoutes = require('./router/kitchenRoutes');
@@ -69,6 +77,14 @@ app.use('/admin/stock-adjustment', stockAdjustmentRoutes);
 app.use('/admin/add-expenses', expenseRoutes);
 app.use('/admin/expense-categories', expenseCategoryRoutes);
 app.use('/admin/add-accounts', accountRoutes);
+// MY routes
+app.use("/", contact_routes);
+app.use("/",group_routes);
+app.use("/",purchase_routes);
+app.use("/",purchase_due);
+app.use("/",purchase_return);
+app.use("/",recipe_s);
+app.use("/",production_m);
 
 // app.use('/finance', financialRoutes);
 app.use('/admin/kitchen', kitchenRoutes);
