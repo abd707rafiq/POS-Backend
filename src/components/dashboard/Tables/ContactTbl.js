@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState,useEffect } from 'react'
 import { AiFillCaretDown, AiOutlinePlus } from 'react-icons/ai'
 import { FaArrowCircleDown, FaColumns, FaEdit, FaEye, FaFileCsv, FaFileExcel, FaFilePdf, FaHourglassHalf, FaMoneyBillAlt, FaPaperclip, FaPowerOff, FaPrint, FaScroll, FaSearch, FaTrash } from 'react-icons/fa'
 import { useReactToPrint } from 'react-to-print';
@@ -9,62 +9,39 @@ import * as htmlToImage from 'html-to-image';
 import { MdCancel } from 'react-icons/md';
 import AddorEditContact from '../contacts/AddorEditContact';
 import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
 
 
 const ContactTbl = () => {
+    
+   
+
     const params = useParams()
     const type = params.type
-    const dummyData = [
-        {
-            id: 1,
-            Username: "username",
-            Name: "User",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 2,
-            Username: "username1",
-            Name: "User1",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 3,
-            Username: "username2",
-            Name: "User2",
-            Role: "Admin",
-            Email: "username2@gmail.com"
-        },
-        {
-            id: 4,
-            Username: "username3",
-            Name: "User3",
-            Role: "Admin",
-            Email: "username3@gmail.com"
-        },
-        {
-            id: 5,
-            Username: "username4",
-            Name: "User4",
-            Role: "Admin",
-            Email: "username4@gmail.com"
-        },
-        {
-            id: 6,
-            Username: "username5",
-            Name: "User5",
-            Role: "Admin",
-            Email: "username5@gmail.com"
-        },
-        {
-            id: 7,
-            Username: "username6",
-            Name: "User6",
-            Role: "Admin",
-            Email: "username6@gmail.com"
+    const _id=params.id
+    console.log(type);
+   const [data,setData]=useState([]);
+   const [updatedContactData, setUpdatedContactData] = useState([]);
+   
+
+useEffect(()=>{
+    
+    const getDataFromApi=async()=>{
+        try{
+            const response= await axios.get(`http://localhost:5000/contacts/${type}`);
+            console.log(response);
+            setData(response.data);
+
+        }catch(e){
+            console.error(e)
         }
-    ]
+
+    }
+
+    getDataFromApi();
+
+
+},[type])
     const printRef = useRef()
     let xlDatas = []
     //Export to Excel
@@ -97,8 +74,8 @@ const ContactTbl = () => {
     const rcrdprpg = 5
     const lasIndex = crpage * rcrdprpg
     const frstIndex = lasIndex - rcrdprpg
-    const record = dummyData.slice(frstIndex, lasIndex)
-    const npage = Math.ceil(dummyData.length / rcrdprpg)
+    const record = data.slice(frstIndex, lasIndex)
+    const npage = Math.ceil(data.length / rcrdprpg)
     const numbers = [...Array(npage + 1).keys()].slice(1)
 
     const [colvis, setColvis] = useState(false)
@@ -130,6 +107,32 @@ const ContactTbl = () => {
     const [editId, setEditId] = useState(0)
     const [isCliked, setIsCliked] = useState(false)
     const [actionList, setActionList] = useState(Array(record.length).fill(false))
+    useEffect(() => {
+    
+        if (isedit && editId !== 0) {
+            const updateData=async()=>{
+                try{
+                 const response=await   axios.delete(`http://localhost:5000/contacts/${type}/${_id}`, updatedContactData)
+                 setUpdatedContactData(response.data)
+                 setIsedit(false);
+                 setEditId(0);
+                 setIsCliked(false);
+    
+                }catch(e){
+                    console.error('Error updating supplier contact:', e);
+    
+                }
+            }
+          updateData();
+          
+            
+            
+            
+        }
+      }, [isedit, editId, updatedContactData,_id,type]);
+    
+      
+    
 
     const toggleDropdown = (index) => {
         const dropDownAction = [...actionList];
@@ -139,7 +142,7 @@ const ContactTbl = () => {
 
     const csvData = [
         ["Username", "Name", "Role", "Email"],
-        ...dummyData.map(({ Username, Name, Role, Email }) => [
+        ...data.map(({ Username, Name, Role, Email }) => [
             Username,
             Name,
             Role,
@@ -173,6 +176,8 @@ const ContactTbl = () => {
         }
     }
 
+
+    console.log(data)
 
 
     return (
@@ -211,7 +216,7 @@ const ContactTbl = () => {
 
                         </CSVLink>
                     </button>
-                    <button onClick={() => { handleExportExcl(dummyData) }} className='flex border-[1px] px-2 py-1 hover:bg-gray-400 border-gray-600 bg-gray-200 '>
+                    <button onClick={() => { handleExportExcl(data) }} className='flex border-[1px] px-2 py-1 hover:bg-gray-400 border-gray-600 bg-gray-200 '>
                         <FaFileExcel size={15} className=' mt-1 pr-[2px]' />
                         <h1 className='text-sm'>Export to Excle</h1>
                     </button>
@@ -296,8 +301,11 @@ const ContactTbl = () => {
                         </tr>
                     </thead>
                     <tbody >
-                        {record.map((value, index) => {
+                        {data.map((value, index) => {
+                            
+                         
                             return <tr key={index} className=''>
+                             
                                 {col1 && <td className='py-1 flex '>
                                     <div onClick={() => { toggleDropdown(index) }} className='flex px-2 py-1 relative cursor-pointer items-center bg-green-600 rounded-xl text-white justify-center'>
                                         <h1 className='text-sm'>Action</h1>
@@ -312,9 +320,11 @@ const ContactTbl = () => {
                                                 </li>
 
                                                 <li className='w-full'>
-                                                    <Link to={`/home/contact/view/${value.id}`} className='flex px-2 py-1 w-full cursor-pointer hover:bg-gray-400 items-center '>
+                                                   
+                                                    <Link to={`/home/contacts/${type}/view/${value.contactId}`} className='flex px-2 py-1 w-full cursor-pointer hover:bg-gray-400 items-center '>
                                                         <FaEye size={15} />
                                                         <h1 className='text-sm'>View</h1>
+                                                        
                                                     </Link >
                                                 </li>
                                                 <li className='w-full'>
@@ -369,29 +379,32 @@ const ContactTbl = () => {
                                         }
                                     </div>
                                 </td>}
-                                {col2 && <td className="px-1 py-1 text-sm">{value.Username}</td>}
-                                {col3 && <td className="px-1 py-1"> {value.Name}</td>}
-                                {col4 && <td className="px-1 py-1">{value.Role}</td>}
-                                {col5 && <td className=" py-1 px-1">{value.Email}</td>}
-                                {col6 && <td className=" py-1 px-1">{value.Role}</td>}
-                                {col7 && <td className="px-1 py-1 text-sm">{value.Username}</td>}
-                                {col8 && <td className="px-1 py-1"> {value.Name}</td>}
-                                {col9 && <td className="px-1 py-1">{value.Role}</td>}
-                                {col10 && <td className=" py-1 px-1">{value.Email}</td>}
-                                {col11 && <td className=" py-1 px-1">{value.Role}</td>}
-                                {col12 && <td className="px-1 py-1 text-sm">{value.Username}</td>}
-                                {col13 && <td className="px-1 py-1"> {value.Name}</td>}
-                                {col14 && <td className="px-1 py-1">{value.Role}</td>}
-                                {col15 && <td className=" py-1 px-1">{value.Email}</td>}
-                                {col16 && <td className=" py-1 px-1">{value.Role}</td>}
-                                {col17 && <td className="px-1 py-1 text-sm">{value.Username}</td>}
-                                {col18 && <td className="px-1 py-1"> {value.Name}</td>}
-                                {col19 && <td className="px-1 py-1">{value.Role}</td>}
-                                {col20 && <td className=" py-1 px-1">{value.Email}</td>}
-                                {col21 && <td className=" py-1 px-1">{value.Role}</td>}
-                                {col22 && <td className="px-1 py-1"> {value.Name}</td>}
-                                {col23 && <td className="px-1 py-1">{value.Role}</td>}
-                                {col24 && <td className=" py-1 px-1">{value.Email}</td>}
+                            
+                                
+
+                                 {col2 && <td className="px-1 py-1 text-sm">{value.contactId}</td>}
+                                {col3 && <td className="px-1 py-1"> {value.businessName}</td>}
+                                {col4 && <td className="px-1 py-1">{value.firstName}</td>}
+                                {col5 && <td className=" py-1 px-1">{value.email}</td>}
+                                {col6 && <td className=" py-1 px-1">{value.taxNumber}</td>}
+                                {col7 && <td className="px-1 py-1 text-sm">{value.payTerm}</td>}
+                                {col8 && <td className="px-1 py-1"> {value.openingBalance}</td>}
+                                {col9 && <td className="px-1 py-1">{value.advanceBalance}</td>}
+                                {col10 && <td className=" py-1 px-1">{value.addressLine1}</td>}
+                                {col11 && <td className=" py-1 px-1">{value.mobile}</td>}
+                                {col12 && <td className="px-1 py-1 text-sm">{value.purchaseDue}</td>}
+                                {col13 && <td className="px-1 py-1"> {value.purchaseReturn}</td>}
+                                {col14 && <td className="px-1 py-1">{value.customField1}</td>}
+                                {col15 && <td className=" py-1 px-1">{value.customField2}</td>}
+                                {col16 && <td className=" py-1 px-1">{value.customField3}</td>}
+                                {col17 && <td className="px-1 py-1 text-sm">{value.customField4}</td>}
+                                {col18 && <td className="px-1 py-1"> {value.customField5}</td>}
+                                {col19 && <td className="px-1 py-1">{value.customField6}</td>}
+                                {col20 && <td className=" py-1 px-1">{value.customField6}</td>}
+                                {col21 && <td className=" py-1 px-1">{value.customField7}</td>}
+                                {col22 && <td className="px-1 py-1"> {value.customField8}</td>}
+                                {col23 && <td className="px-1 py-1">{value.customField9}</td>}
+                                {col24 && <td className=" py-1 px-1">{value.customField10}</td>} 
                             </tr>
                         })}
 

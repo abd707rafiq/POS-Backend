@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaBriefcase, FaCalendar, FaChevronCircleDown, FaEnvelope, FaGlobe, FaIdBadge, FaInfo, FaMapMarker, FaMobile, FaMoneyBillAlt, FaPhone, FaUser, FaUsers } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 const AddorEditContact = (props) => {
     const params = useParams()
     const type= params.type
     console.log(type)
-    const [iserror, setIserror] = useState(false)
+    const [iserror, setIsError] = useState(false)
     const [moreInfor, setMoreInfor] = useState(false)
     const [radioVal, setRadioVal] = useState('')
     const [formData, setFormData] = useState({
@@ -49,22 +50,36 @@ const AddorEditContact = (props) => {
 
     })
 
-    const handleClick = () => {
-        if ((formData.firstName.length === 0 && radioVal ==="individual")||
-        formData.contactType.length === 0 || 
-        formData.mobile.length === 0) {
-            setIserror(true)
-        } else if (props.id === 0) {
-            console.log("Handle Save", formData)
-        } else if (props.id !== 0) {
-            console.log("Handle Update", formData)
+    const handleClick = async () => {
+        if (
+            (formData.firstName.length === 0 && radioVal === "individual") ||
+            formData.contactType.length === 0 ||
+            formData.mobile.length === 0
+        ) {
+            setIsError(true);
+        } else {
+            const postData = {
+                contactType: formData.contactType,
+                firstName: formData.firstName,
+                mobile: formData.mobile,
+                // Add other fields here...
+            };
+
+            try {
+                const response = await axios.post('http://localhost:5000/contacts/supplier', postData);
+                console.log('Contact created successfully:', response.data);
+                // Handle any further actions after successful creation
+            } catch (error) {
+                console.error('Error creating contact:', error);
+                // Handle errors here
+            }
         }
-    }
+    };
 
-
+   
 
     return (
-        <div className='flex w-full md:w-[75%] flex-col justify-center items-center bg-white p-5'>
+        <div className='flex w-full  flex-col justify-center items-center bg-white p-5'>
             <h1 className=' text-xl font-bold flex justify-start w-full'>{props.id !== 0 ? "Edit a contact" : "Add a new contact"}</h1>
             <div className=' w-full flex flex-col'>
                 <div className='grid grid-cols-1 mt-2 md:grid-cols-3 gap-2'>
