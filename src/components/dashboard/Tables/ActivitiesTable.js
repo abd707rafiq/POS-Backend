@@ -2,58 +2,6 @@ import React, {  useState } from 'react'
 
 
 const ActivitiesTable = () => {
-    const dummyData = [
-        {
-            id: 1,
-            Username: "username",
-            Name: "User",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 2,
-            Username: "username1",
-            Name: "User1",
-            Role: "Admin",
-            Email: "username@gmail.com"
-        },
-        {
-            id: 3,
-            Username: "username2",
-            Name: "User2",
-            Role: "Admin",
-            Email: "username2@gmail.com"
-        },
-        {
-            id: 4,
-            Username: "username3",
-            Name: "User3",
-            Role: "Admin",
-            Email: "username3@gmail.com"
-        },
-        {
-            id: 5,
-            Username: "username4",
-            Name: "User4",
-            Role: "Admin",
-            Email: "username4@gmail.com"
-        },
-        {
-            id: 6,
-            Username: "username5",
-            Name: "User5",
-            Role: "Admin",
-            Email: "username5@gmail.com"
-        },
-        {
-            id: 7,
-            Username: "username6",
-            Name: "User6",
-            Role: "Admin",
-            Email: "username6@gmail.com"
-        }
-    ]
-   
     
     
     
