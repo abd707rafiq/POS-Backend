@@ -18,7 +18,7 @@ const ContactTbl = () => {
 
     const params = useParams()
     const type = params.type
-    const _id=params.id
+    const {_id}=params;
     console.log(type);
    const [data,setData]=useState([]);
    const [updatedContactData, setUpdatedContactData] = useState([]);
@@ -321,7 +321,7 @@ useEffect(()=>{
 
                                                 <li className='w-full'>
                                                    
-                                                    <Link to={`/home/contacts/${type}/view/${value.contactId}`} className='flex px-2 py-1 w-full cursor-pointer hover:bg-gray-400 items-center '>
+                                                    <Link to={`/home/contacts/${type}/view/${value._id}`} className='flex px-2 py-1 w-full cursor-pointer hover:bg-gray-400 items-center '>
                                                         <FaEye size={15} />
                                                         <h1 className='text-sm'>View</h1>
                                                         

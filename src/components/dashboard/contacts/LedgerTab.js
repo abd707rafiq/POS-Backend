@@ -1,66 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DefinedRange } from 'react-date-range';
 import { FaEnvelope, FaFilePdf } from "react-icons/fa"
 import { format } from 'date-fns';
 import { addDays } from 'date-fns';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const LedgerTab = () => {
   const [format1, setFormat1] = useState(true)
   const [format2, setFormat2] = useState(false)
   const [format3, setFormat3] = useState(false)
-  const dummyData = [
-    {
-      id: 1,
-      Username: "username",
-      Name: "User",
-      Role: "Admin",
-      Email: "username@gmail.com"
-    },
-    {
-      id: 2,
-      Username: "username1",
-      Name: "User1",
-      Role: "Admin",
-      Email: "username@gmail.com"
-    },
-    {
-      id: 3,
-      Username: "username2",
-      Name: "User2",
-      Role: "Admin",
-      Email: "username2@gmail.com"
-    },
-    {
-      id: 4,
-      Username: "username3",
-      Name: "User3",
-      Role: "Admin",
-      Email: "username3@gmail.com"
-    },
-    {
-      id: 5,
-      Username: "username4",
-      Name: "User4",
-      Role: "Admin",
-      Email: "username4@gmail.com"
-    },
-    {
-      id: 6,
-      Username: "username5",
-      Name: "User5",
-      Role: "Admin",
-      Email: "username5@gmail.com"
-    },
-    {
-      id: 7,
-      Username: "username6",
-      Name: "User6",
-      Role: "Admin",
-      Email: "username6@gmail.com"
-    }
-  ]
+  const [data,setData]=useState([]);
+  const params = useParams();
+    const type=params.type
+    const { _id } = params;
+    console.log("i am id",_id);
+    
+    
+    
+    
+    
+    useEffect(()=>{
+        const getDataFromApi=async()=>{
+            
+            try{
+                const response=await axios.get(`http://localhost:5000/contacts/${type}/${_id}` );
+              
+                setData(response.data);
+                console.log("single data",response);
+
+            }
+            catch(error){
+                console.log('view is not fetched', error)
+            }
+            
+        }
+        getDataFromApi();
+
+    },[_id,type]);
+       
   const [range, setRange] = useState([
     {
       startDate: new Date(),
@@ -125,8 +105,8 @@ const LedgerTab = () => {
                 <div className='w-1/2 px-1 py-1 bg-blue-600 text-white'>
                   <h1 className='text-start'>To:</h1>
                 </div>
-                <h1 className='font-bold text-sm mx-2 text-start'>User Name</h1>
-                <h1 className=' text-sm mx-2 text-start'>Address</h1>
+                <h1 className='font-bold text-sm mx-2 text-start'>data.Username</h1>
+                <h1 className=' text-sm mx-2 text-start'>data.addressLine1</h1>
                 <h1 className=' text-sm mx-2 text-start'>Mobile: <p className='mx-1'>12345678910</p></h1>
 
               </div>
@@ -184,7 +164,7 @@ const LedgerTab = () => {
                   </tr>
                 </thead>
                 <tbody >
-                  {dummyData.map((value, index) => {
+                  {data.map((value, index) => {
                     return <tr key={index} className=''>
 
                       <td className="px-1 py-1 text-sm">{value.Username}</td>
@@ -253,7 +233,7 @@ const LedgerTab = () => {
                   </tr>
                 </thead>
                 <tbody >
-                  {dummyData.map((value, index) => {
+                  {data.map((value, index) => {
                     return <tr key={index} className=''>
 
                       <td className="px-1 py-1 text-sm">{value.Username}</td>
@@ -365,7 +345,7 @@ const LedgerTab = () => {
                   </tr>
                 </thead>
                 <tbody >
-                  {dummyData.map((value, index) => {
+                  {data.map((value, index) => {
                     return <tr key={index} className=''>
 
                       <td className="px-1 py-1 text-sm">{value.Username}</td>

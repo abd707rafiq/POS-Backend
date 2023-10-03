@@ -7,8 +7,9 @@ import axios from 'axios'
 const ViewContact = () => {
    
     const [data,setData]=useState([]);
-    const params=useParams();
-    const _id=params.id
+    const params = useParams();
+    const type=params.type
+    const { _id } = params;
     console.log("i am id",_id);
     
     
@@ -19,7 +20,7 @@ const ViewContact = () => {
         const getDataFromApi=async()=>{
             
             try{
-                const response=await axios.get(`http://localhost:5000/contacts/supplier/${_id}` );
+                const response=await axios.get(`http://localhost:5000/contacts/${type}/${_id}` );
               
                 setData(response.data);
                 console.log("single data",response);
@@ -32,7 +33,7 @@ const ViewContact = () => {
         }
         getDataFromApi();
 
-    },[_id]);
+    },[_id,type]);
        
     return (
         <div className='w-full p-2 bg-gray-200 min-h-screen'>
